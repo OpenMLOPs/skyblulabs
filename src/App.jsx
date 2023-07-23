@@ -10,7 +10,7 @@ import { Redirect } from 'react-router-dom/cjs/react-router-dom.min'
 const App = () => {
     return (
         <>
-        <Navbar />
+            <Navbar />
             <Switch>
                 <Route exact path="/" component={Home} />
                 <Route exact path="/about" component={About} />
