@@ -1,0 +1,48 @@
+.carousel-wrapper {
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+    max-height: max-content;
+}
+
+.carousel .carousel-slide {
+    padding: 8rem 4rem 8rem;
+    /* Adjust the padding value as needed */
+    transition: transform 1s ease-in-out;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel .carousel-slide img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    /* Maintain the aspect ratio without cutting the image */
+}
+
+.carousel .slide {
+    opacity: 0.6;
+    /* Adjust opacity for non-active slides */
+    transition: opacity 0.3s ease;
+}
+
+.carousel .slide.selected {
+    opacity: 1;
+    /* Active slide has full opacity */
+}
+
+.carousel .slide.selected .carousel-slide img {
+    transform: scale(1.8);
+    /* Increase the scale value to make the center image bigger */
+}
+
+.carousel .slide.selected .carousel-slide {
+    z-index: 1;
+    /* Set z-index to bring the center image to the top */
+}
+
+.carousel .thumbs-wrapper {
+    display: none;
+}

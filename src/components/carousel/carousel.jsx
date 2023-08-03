@@ -1,6 +1,7 @@
 import React from 'react';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import './carousel.css'
 
 const images = [
   { id: 1, src: 'https://s7ap1.scene7.com/is/image/TCSCOMprod/innovate-adapt-thrive?wid=1366&hei=768&dpr=off', alt: 'Image 1' },

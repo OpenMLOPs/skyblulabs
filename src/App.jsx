@@ -1,23 +1,21 @@
 import React from 'react'
-import Home from './pages/Home'
-import About from './pages/About'
-import Service from './pages/Service'
-import Contact from './pages/Contact'
-import Navbar from './components/navbar'
-import { Route, Switch } from 'react-router-dom';
-import { Redirect } from 'react-router-dom/cjs/react-router-dom.min'
+import Navbar from './components/navbar/navbar'
+import Carousel from './components/carousel/carousel';
+import Service from './components/services/service';
 
 const App = () => {
     return (
         <>
             <Navbar />
-            <Switch>
+            {/* <Switch>
                 <Route exact path="/" component={Home} />
                 <Route exact path="/about" component={About} />
-                <Route exact path="/service" component={Service} />
+                <Route exact path="/service" component={Services} />
                 <Route exact path="/contact" component={Contact} />
                 <Redirect to="/" />
-            </Switch>
+            </Switch> */}
+            <Carousel />
+            <Service />
         </>
     );
 };
