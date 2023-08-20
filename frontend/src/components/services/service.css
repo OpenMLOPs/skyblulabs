@@ -1,0 +1,40 @@
+.buttongroup {
+  box-shadow: none !important;
+}
+
+.first{
+  border-radius: 20px 0 0 20px !important;
+}
+
+.last{
+  border-radius: 0 20px 20px 0 !important;
+}
+
+
+.image {
+  height: 50px;
+  padding-bottom: 10px;
+}
+
+.paper {
+  padding: 16px;
+  text-align: center;
+  box-shadow: none !important;
+}
+
+.divisions {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.gridcontainer{
+  flex-wrap: nowrap !important;
+  justify-content: space-evenly;
+}
+
+@media (max-width: 1250px ) {
+  .gridcontainer{
+    flex-wrap: wrap !important;
+  }
+}
