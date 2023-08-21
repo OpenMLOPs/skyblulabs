@@ -1,31 +1,17 @@
 import React from 'react';
-import Navbar from './components/navbar/navbar.jsx';
-import Contact from './components/contact/contact.jsx';
-import About from './components/about/about.jsx';
-import Service from './components/services/service.jsx';
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/home/home.jsx';
+import Careers from './pages/careers/careers.jsx';
+import About from './pages/about/about.jsx';
 
 const App = () => {
-    const textColorStyle = {
-        color: '#0F00BD',
-    };
-
     return (
         <>
-            <div className="overlayContainer">
-                <Navbar />
-                <div className="background">
-                    <div className='bgoverlay'>
-                        <div className="textContainer">
-                            <p className="mainText"><b>Let's Build <span style={textColorStyle}>Your Project</span><br />Together</b></p>
-                        </div>
-                        <div className="contactdiv">
-                            <Contact />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <About />
-            <Service />
+            <Routes>
+                <Route index element={<Home />} />
+                <Route path="/careers" element={<Careers />} />
+                <Route path="/about" element={<About />} />
+            </Routes>
         </>
     );
 };

@@ -7,55 +7,7 @@
   padding: 0;
 }
 
-.overlayContainer {
-  position: relative;
-}
-
-.mainText{
-  color: #000;
-}
-
-.background {
-  background-image: url('../public/R.jpeg');
-  background-size: cover;
-  background-position: center;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.bgoverlay {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  width: 100%;
-}
-
-.textContainer,
-.contactdiv {
-  flex: 1;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-.textContainer{
-  font-size: 60px;
-  display: flex;
-  justify-content: center;
-  color: #fff;
-}
-
-@media (max-width: 1024px) {
-  .bgoverlay {
-    flex-direction: column;
-  }
-  .textContainer{
-    padding-top: 13vh;
-    font-size: 48px;
-    display: flex;
-    justify-content: center;
-    color: #fff;
-  }
+a:-webkit-any-link {
+  text-decoration: none;
+  color: inherit;
 }
