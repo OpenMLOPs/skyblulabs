@@ -7,7 +7,7 @@ const about = () => {
         <>
             <Navbar />
             <Container className='about'>
-                <Typography variant="h1" align="center" style={{ marginBottom: '50px', marginTop: '200px' }}>
+                <Typography variant="h2" align="center" style={{ marginBottom: '50px', marginTop: '200px' }}>
                     <b>About Us</b>
                 </Typography>
                 <Typography variant='h5' align='center'>
