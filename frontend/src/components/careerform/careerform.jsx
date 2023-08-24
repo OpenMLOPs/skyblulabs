@@ -28,15 +28,14 @@ const Careerform = () => {
         event.preventDefault();
         const formDataToSend = new FormData();
         formDataToSend.append('file', uploadedFile);
-        console.log(formDataToSend)
         Object.keys(formData).forEach((key) => {
             formDataToSend.append(key, formData[key]);
           });
         try {
             await axios.post('http://localhost:3001/careers', formDataToSend, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                  }
+                // headers: {
+                //     'Content-Type': 'multipart/form-data'
+                //   }
             });
             setIsSuccessPopupOpen(true);
             setFormData({

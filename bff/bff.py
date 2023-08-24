@@ -2,7 +2,9 @@ import os
 import json
 from dotenv import load_dotenv
 from google.oauth2 import service_account
+from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaFileUpload
 import gspread
 from flask import Flask, request
 from flask_cors import CORS
@@ -18,21 +20,21 @@ for var_name in env_variables:
 json_format = json.dumps(env_data, indent=4)
 
 FILE = 'secrets.json'
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+SPREADSHEET_ID = '1TO8JR1Lb4DFv9Sv6UQruxfN_NxhAq0P0ZYa_fqwl6vE'
+if not os.path.exists(FILE):
+    with open(FILE, "w") as json_file:
+        json_file.write(json_format)    
 
 @app.route('/contact', methods=['POST'])
 def get_data():
     RANGE = 'Sheet1'
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-    SPREADSHEET_ID = '1TO8JR1Lb4DFv9Sv6UQruxfN_NxhAq0P0ZYa_fqwl6vE'
     
     data = request.json
     name = data['name'] 
     email = data['email']
     phone = data['phone']
     description = data['description']
-    if not os.path.exists(FILE):
-        with open(FILE, "w") as json_file:
-            json_file.write(json_format)    
     try:
         creds = service_account.Credentials.from_service_account_file(FILE, scopes=SCOPES)
         client = gspread.authorize(creds)
@@ -46,33 +48,39 @@ def get_data():
 @app.route('/careers', methods=['POST'])
 def careers():
     RANGE = 'Sheet2'
-    SCOPES = ['https://www.googleapis.com/auth/drive.file']
+    DRIVE_SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
-    # data = request.json
-    # name = data['name'] 
-    # email = data['email']
-    # phone = data['phone']
-    # description = data['description']
-    # if not os.path.exists(FILE):
-    #     with open(FILE, "w") as json_file:
-    #         json_file.write(json_format)    
+    form_data = {}
+    uploaded_file = None
+    try:
+        # creds = service_account.Credentials.from_service_account_file(FILE, scopes=DRIVE_SCOPES)
+        # service = build('drive', 'v3', credentials=creds)
+        if 'file' in request.files:
+            print("run")
+            uploaded_file = request.files['file']
+            print(uploaded_file)
+        # file_metadata = {'name': uploaded_file.filename}
+        # media = MediaFileUpload(uploaded_file, mimetype=uploaded_file.mimetype)
+        # file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        
+    except Exception as e:
+        print('Error: ' + str(e))
+
+    for key, value in request.form.items():
+        form_data[key] = value
+    name = form_data['name'] 
+    email = form_data['email']
+    phone = form_data['phone']
+
     # try:
     #     creds = service_account.Credentials.from_service_account_file(FILE, scopes=SCOPES)
     #     client = gspread.authorize(creds)
     #     spreadsheet = client.open_by_key(SPREADSHEET_ID)
     #     worksheet = spreadsheet.worksheet(RANGE)
-    #     data = [name, email, phone, description]
+    #     data = [name, email, phone]
     #     return worksheet.append_row(data)
     # except HttpError as err:
     #     print(err)
-    form_data = {}
-    pdf_file = None
-
-    for key, value in request.form.items():
-        form_data[key] = value
-
-    if 'file' in request.files:
-        pdf_file = request.files['file']
 
     return 'Data received successfully'
 
