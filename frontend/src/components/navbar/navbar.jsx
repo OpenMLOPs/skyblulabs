@@ -29,17 +29,17 @@ const DoubleNavbar = () => {
             <img src='skyblulabs white.png' alt="Logo" className="logoImage" />
           </div>
           <div className="mainNavLinks">
-            <Link exact to='/' smooth={true} duration={500}>
+            <Link exact="true" to='/' smooth="true" duration={500}>
               <Typography variant="body1" className='scroll-link'>
                 Home
               </Typography>
             </Link>
-            <Link exact to='/about' smooth={true} duration={500}>
+            <Link exact="true" to='/about' smooth="true" duration={500}>
               <Typography variant="body1" className='scroll-link'>
                 About Us
               </Typography>
             </Link>
-            <Link exact to='/careers' smooth={true} duration={500}>
+            <Link exact="true" to='/careers' smooth="true" duration={500}>
               <Typography variant="body1" className='scroll-link'>
                 Careers
               </Typography>

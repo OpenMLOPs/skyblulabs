@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Grid, Snackbar } from '@mui/material';
+import Loading from '../loading/loading';
 import axios from 'axios';
 import './contact.css';
 
@@ -12,6 +13,7 @@ const ContactForm = () => {
     });
 
     const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
+    const [isLoading, setLoading] = useState(false);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -24,6 +26,7 @@ const ContactForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
+            setLoading(true);
             await axios.post('http://localhost:3001/contact', formData);
             setIsSuccessPopupOpen(true);
             setFormData({
@@ -32,6 +35,7 @@ const ContactForm = () => {
                 phone: '',
                 description: '',
             });
+            setLoading(false);
         } catch (error) {
             console.error('Error sending data to BFF:', error);
         }
@@ -43,6 +47,7 @@ const ContactForm = () => {
 
     return (
         <Container maxWidth="sm" className='contactform'>
+            <Loading loading={isLoading} />
             <div className="form-box">
                 <Typography variant="h4" align="center" gutterBottom>
                     Contact Us

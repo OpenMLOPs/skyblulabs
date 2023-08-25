@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Grid, Snackbar, Paper } from '@mui/material';
 import axios from 'axios';
 import './careerform.css';
+import Loading from '../loading/loading';
 
 const Careerform = () => {
     const [formData, setFormData] = useState({
@@ -9,12 +10,12 @@ const Careerform = () => {
         email: '',
         phone: '',
     });
-
     const [isSuccessPopupOpen, setIsSuccessPopupOpen] = useState(false);
     const [isInvalidFileTypeSnackbarOpen, setIsInvalidFileTypeSnackbarOpen] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
     const [uploadedFile, setUploadedFile] = useState(null);
-
+    const [uploadedFileName, setUploadedFileName] = useState(null);
+    const [isLoading, setLoading] = useState(false);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -27,15 +28,17 @@ const Careerform = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         const formDataToSend = new FormData();
+        if (!uploadedFile) return setIsInvalidFileTypeSnackbarOpen(true);
         formDataToSend.append('file', uploadedFile);
         Object.keys(formData).forEach((key) => {
             formDataToSend.append(key, formData[key]);
-          });
+        });
         try {
+            setLoading(true);
             await axios.post('http://localhost:3001/careers', formDataToSend, {
-                // headers: {
-                //     'Content-Type': 'multipart/form-data'
-                //   }
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
             setIsSuccessPopupOpen(true);
             setFormData({
@@ -44,6 +47,8 @@ const Careerform = () => {
                 phone: '',
             });
             setUploadedFile(null);
+            setUploadedFileName(null);
+            setLoading(false);
         } catch (error) {
             console.error('Error sending data to BFF:', error);
         }
@@ -52,12 +57,6 @@ const Careerform = () => {
     const handleClosePopup = () => {
         setIsSuccessPopupOpen(false);
     };
-
-
-
-
-
-    
 
     const handleDragEnter = (e) => {
         e.preventDefault();
@@ -77,7 +76,9 @@ const Careerform = () => {
         if (files.length > 0) {
             const file = files[0];
             if (file.type === 'application/pdf') {
-                setUploadedFile(file.name);
+                setUploadedFile(file);
+                setUploadedFileName(file.name);
+
             } else {
                 setIsInvalidFileTypeSnackbarOpen(true);
             }
@@ -85,7 +86,7 @@ const Careerform = () => {
     };
 
     const handleClick = () => {
-        document.getElementById('fileInput').click();
+        document.getElementById('file').click();
     };
 
     const handleFileChange = (e) => {
@@ -93,23 +94,19 @@ const Careerform = () => {
         if (files.length > 0) {
             const file = files[0];
             if (file.type === 'application/pdf') {
-                setUploadedFile(file.name);
+                setUploadedFile(file);
+                setUploadedFileName(file.name);
             } else {
                 setIsInvalidFileTypeSnackbarOpen(true);
             }
         }
     };
 
-
-
-
-
     return (
         <Container maxWidth="sm" className='careerform'>
+            <Loading loading={isLoading} />
             <div className="form-box">
-                <Typography variant="h2" align="center" gutterBottom style={{ marginBottom: '50px' }}>
-                    <b>Careers</b>
-                </Typography>
+                <Typography variant="h2" align="center" gutterBottom style={{ marginBottom: '50px' }}><b>Careers</b></Typography>
                 <form onSubmit={handleSubmit}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
@@ -123,25 +120,23 @@ const Careerform = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <Paper className={`drop-zone ${isDragOver ? 'drag-over' : ''}`} onDragEnter={handleDragEnter} onDragOver={handleDragEnter} onDragLeave={handleDragLeave} onDrop={handleDrop} onClick={handleClick} variant='outlined' style={{ height: '50px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                {uploadedFile ? (
-                                    <Typography variant="body1">{uploadedFile}</Typography>
+                                {uploadedFileName ? (
+                                    <Typography variant="body1">{uploadedFileName}</Typography>
                                 ) : (
                                     <>
-                                        <input type="file" id="fileInput" style={{ display: 'none' }} onChange={handleFileChange} />
+                                        <input type="file" id="file" style={{ display: 'none' }} onChange={handleFileChange}/>
                                         <Typography variant="h6" color={'#bababa'}>Drag & Drop files here or click to browse</Typography>
                                     </>
                                 )}
                             </Paper>
                         </Grid>
                         <Grid item xs={12}>
-                            <Button variant="contained" color="primary" type="submit" fullWidth>
-                                Submit
-                            </Button>
+                            <Button variant="contained" color="primary" type="submit" fullWidth>Submit</Button>
                         </Grid>
                     </Grid>
                 </form>
             </div>
-            <Snackbar open={isInvalidFileTypeSnackbarOpen} autoHideDuration={3000} onClose={() => setIsInvalidFileTypeSnackbarOpen(false)} message="Invalid File Type" />
+            <Snackbar open={isInvalidFileTypeSnackbarOpen} autoHideDuration={3000} onClose={() => setIsInvalidFileTypeSnackbarOpen(false)} message="Attach a PDF File (Resume)" />
             <Snackbar open={isSuccessPopupOpen} autoHideDuration={3000} onClose={handleClosePopup} message="Form Submitted Successfully" />
         </Container>
     );

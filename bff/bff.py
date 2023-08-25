@@ -4,12 +4,14 @@ from dotenv import load_dotenv
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaIoBaseUpload
 import gspread
 from flask import Flask, request
 from flask_cors import CORS
+from werkzeug.datastructures import FileStorage
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 CORS(app)
 load_dotenv()
 
@@ -49,40 +51,37 @@ def get_data():
 def careers():
     RANGE = 'Sheet2'
     DRIVE_SCOPES = ['https://www.googleapis.com/auth/drive.file']
+    DRIVE_FOLDER_ID = "1YZs71dpb09ENd9moE4N1HeNGo9zRNMYT"
 
     form_data = {}
-    uploaded_file = None
     try:
-        # creds = service_account.Credentials.from_service_account_file(FILE, scopes=DRIVE_SCOPES)
-        # service = build('drive', 'v3', credentials=creds)
-        if 'file' in request.files:
-            print("run")
-            uploaded_file = request.files['file']
-            print(uploaded_file)
-        # file_metadata = {'name': uploaded_file.filename}
-        # media = MediaFileUpload(uploaded_file, mimetype=uploaded_file.mimetype)
-        # file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        creds = service_account.Credentials.from_service_account_file(FILE, scopes=DRIVE_SCOPES)
+        service = build('drive', 'v3', credentials=creds)
+        uploaded_file = request.files['file']
+        file_storage = FileStorage(filename=uploaded_file.filename, stream=uploaded_file)
+        media = MediaIoBaseUpload(uploaded_file.stream, mimetype=uploaded_file.mimetype, resumable=True)
+        file_metadata = {
+            'name': file_storage.filename,
+            'parents': [DRIVE_FOLDER_ID]
+        }
+        uploaded_file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
         
+        for key, value in request.form.items():
+            form_data[key] = value
+        name = form_data['name'] 
+        email = form_data['email']
+        phone = form_data['phone']
+        link = f"https://drive.google.com/file/d/{uploaded_file['id']}"
+
+        creds = service_account.Credentials.from_service_account_file(FILE, scopes=SCOPES)
+        client = gspread.authorize(creds)
+        spreadsheet = client.open_by_key(SPREADSHEET_ID)
+        worksheet = spreadsheet.worksheet(RANGE)
+        data = [name, email, phone, link]
+        return worksheet.append_row(data)
+
     except Exception as e:
         print('Error: ' + str(e))
-
-    for key, value in request.form.items():
-        form_data[key] = value
-    name = form_data['name'] 
-    email = form_data['email']
-    phone = form_data['phone']
-
-    # try:
-    #     creds = service_account.Credentials.from_service_account_file(FILE, scopes=SCOPES)
-    #     client = gspread.authorize(creds)
-    #     spreadsheet = client.open_by_key(SPREADSHEET_ID)
-    #     worksheet = spreadsheet.worksheet(RANGE)
-    #     data = [name, email, phone]
-    #     return worksheet.append_row(data)
-    # except HttpError as err:
-    #     print(err)
-
-    return 'Data received successfully'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3001)
