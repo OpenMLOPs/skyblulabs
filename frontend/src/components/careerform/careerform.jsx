@@ -86,7 +86,14 @@ const Careerform = () => {
     };
 
     const handleClick = () => {
-        document.getElementById('file').click();
+        const fileInput = document.getElementById('file');
+        if (uploadedFile) {
+            setUploadedFile(null);
+            setUploadedFileName(null);
+        }
+        if (fileInput) {
+            fileInput.click();
+        }
     };
 
     const handleFileChange = (e) => {
@@ -124,7 +131,7 @@ const Careerform = () => {
                                     <Typography variant="body1">{uploadedFileName}</Typography>
                                 ) : (
                                     <>
-                                        <input type="file" id="file" style={{ display: 'none' }} onChange={handleFileChange}/>
+                                        <input type="file" id="file" style={{ display: 'none' }} onChange={handleFileChange} />
                                         <Typography variant="h6" color={'#bababa'}>Drag & Drop files here or click to browse</Typography>
                                     </>
                                 )}
