@@ -116,7 +116,7 @@ const App = () => {
 
     return (
         <Container className='servicecontainer'>
-            <Typography variant="h3" align="center" style={{ marginBottom: '25px', marginTop: '25px' }}>
+            <Typography variant="h2" align="center" style={{ marginBottom: '50px', marginTop: '100px' }}>
                 <b>Our Services</b>
             </Typography>
             <ButtonGroup className='buttongroup' fullWidth variant="contained">

@@ -2,13 +2,13 @@ import React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { Link } from 'react-scroll';
+import { Link } from 'react-router-dom';
 import './navbar.css';
 
 const DoubleNavbar = () => {
   return (
     <div className="root">
-      <AppBar position="fixed" className="appBar">
+      <AppBar position="static" className="appBar">
         <Toolbar className="toolbar">
           <div>
             <Typography variant="body1">
@@ -23,25 +23,25 @@ const DoubleNavbar = () => {
         </Toolbar>
       </AppBar>
 
-      <AppBar position="fixed" className="mainAppBar">
+      <AppBar position="static" className="mainAppBar">
         <Toolbar className="toolbar mainToolbar">
           <div className="logoContainer">
             <img src='skyblulabs white.png' alt="Logo" className="logoImage" />
           </div>
           <div className="mainNavLinks">
-            <Link to='overlayContainer' smooth={true} duration={500}>
+            <Link exact="true" to='/' smooth="true" duration={500}>
               <Typography variant="body1" className='scroll-link'>
                 Home
               </Typography>
             </Link>
-            <Link to='about' smooth={true} duration={500}>
+            <Link exact="true" to='/about' smooth="true" duration={500}>
               <Typography variant="body1" className='scroll-link'>
                 About Us
               </Typography>
             </Link>
-            <Link to='servicecontainer' smooth={true} duration={500}>
+            <Link exact="true" to='/careers' smooth="true" duration={500}>
               <Typography variant="body1" className='scroll-link'>
-                Services
+                Careers
               </Typography>
             </Link>
           </div>
