@@ -27,7 +27,7 @@ const ContactForm = () => {
         event.preventDefault();
         try {
             setLoading(true);
-            await axios.post('http://localhost:3001/contact', formData);
+            await axios.post('http://localhost:8000/contact', formData);
             setIsSuccessPopupOpen(true);
             setFormData({
                 name: '',

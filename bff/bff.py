@@ -9,36 +9,89 @@ import gspread
 from flask import Flask, request
 from flask_cors import CORS
 from werkzeug.datastructures import FileStorage
+from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
-app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
-CORS(app)
+
+# app = Flask(__name__)
+# app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024
+# CORS(app)
+
+app = FastAPI()
+
+
+# Configure CORS
+origins = [
+    "http://localhost",
+    "http://localhost:3000",  # Add the domains from which you want to allow requests
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class Item(BaseModel):
+    name: str
+    email: str
+    phone: str
+    description: str
+
+
+class CareersItem(BaseModel):
+    name: str
+    email: str
+    phone: str
+    file: UploadFile
+
+
 load_dotenv()
 
-env_variables = ["type", "project_id", "private_key_id", "private_key", "client_email", "client_id", "auth_uri", "token_uri", "auth_provider_x509_cert_url", "client_x509_cert_url", "universe_domain"]
+env_variables = [
+    "type",
+    "project_id",
+    "private_key_id",
+    "private_key",
+    "client_email",
+    "client_id",
+    "auth_uri",
+    "token_uri",
+    "auth_provider_x509_cert_url",
+    "client_x509_cert_url",
+    "universe_domain",
+]
 env_data = {}
 for var_name in env_variables:
     env_data[var_name] = os.getenv(var_name)
 json_format = json.dumps(env_data, indent=4)
 
-FILE = 'secrets.json'
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SPREADSHEET_ID = '1TO8JR1Lb4DFv9Sv6UQruxfN_NxhAq0P0ZYa_fqwl6vE'
+FILE = "secrets.json"
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+SPREADSHEET_ID = "1TO8JR1Lb4DFv9Sv6UQruxfN_NxhAq0P0ZYa_fqwl6vE"
 if not os.path.exists(FILE):
     with open(FILE, "w") as json_file:
-        json_file.write(json_format)    
+        json_file.write(json_format)
 
-@app.route('/contact', methods=['POST'])
-def get_data():
-    RANGE = 'Sheet1'
-    
-    data = request.json
-    name = data['name'] 
-    email = data['email']
-    phone = data['phone']
-    description = data['description']
+
+@app.post("/contact")
+async def get_data(item: Item):
+    RANGE = "Sheet1"
+    # print("data received")
+    name = item.name
+    email = item.email
+    phone = item.phone
+    description = item.description
+    # You can now process or store the received data
+    # print(name, email, phone, description)
     try:
-        creds = service_account.Credentials.from_service_account_file(FILE, scopes=SCOPES)
+        creds = service_account.Credentials.from_service_account_file(
+            FILE, scopes=SCOPES
+        )
         client = gspread.authorize(creds)
         spreadsheet = client.open_by_key(SPREADSHEET_ID)
         worksheet = spreadsheet.worksheet(RANGE)
@@ -46,42 +99,62 @@ def get_data():
         return worksheet.append_row(data)
     except HttpError as err:
         print(err)
+    return {"message": "data received successfully"}
 
-@app.route('/careers', methods=['POST'])
-def careers():
-    RANGE = 'Sheet2'
-    DRIVE_SCOPES = ['https://www.googleapis.com/auth/drive.file']
-    DRIVE_FOLDER_ID = "1YZs71dpb09ENd9moE4N1HeNGo9zRNMYT"
 
-    form_data = {}
-    try:
-        creds = service_account.Credentials.from_service_account_file(FILE, scopes=DRIVE_SCOPES)
-        service = build('drive', 'v3', credentials=creds)
-        uploaded_file = request.files['file']
-        file_storage = FileStorage(filename=uploaded_file.filename, stream=uploaded_file)
-        media = MediaIoBaseUpload(uploaded_file.stream, mimetype=uploaded_file.mimetype, resumable=True)
-        file_metadata = {
-            'name': file_storage.filename,
-            'parents': [DRIVE_FOLDER_ID]
-        }
-        uploaded_file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-        
-        for key, value in request.form.items():
-            form_data[key] = value
-        name = form_data['name'] 
-        email = form_data['email']
-        phone = form_data['phone']
-        link = f"https://drive.google.com/file/d/{uploaded_file['id']}"
+@app.post("/careers")
+async def careers(request: CareersItem):
+    temp = await request.form()
+    print(temp["file"].filename)
+    print(request.name, request.email, request.phone)
+    # RANGE = "Sheet2"
+    # DRIVE_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+    # DRIVE_FOLDER_ID = "1YZs71dpb09ENd9moE4N1HeNGo9zRNMYT"
 
-        creds = service_account.Credentials.from_service_account_file(FILE, scopes=SCOPES)
-        client = gspread.authorize(creds)
-        spreadsheet = client.open_by_key(SPREADSHEET_ID)
-        worksheet = spreadsheet.worksheet(RANGE)
-        data = [name, email, phone, link]
-        return worksheet.append_row(data)
+    # form_data = {}
+    # try:
+    #     creds = service_account.Credentials.from_service_account_file(
+    #         FILE, scopes=DRIVE_SCOPES
+    #     )
+    #     service = build("drive", "v3", credentials=creds)
+    #     uploaded_file = request.file
+    #     file_storage = FileStorage(
+    #         filename=uploaded_file.filename, stream=uploaded_file
+    #     )
+    #     media = MediaIoBaseUpload(
+    #         uploaded_file.stream, mimetype=uploaded_file.mimetype, resumable=True
+    #     )
+    #     file_metadata = {"name": file_storage.filename, "parents": [DRIVE_FOLDER_ID]}
+    #     uploaded_file = (
+    #         service.files()
+    #         .create(body=file_metadata, media_body=media, fields="id")
+    #         .execute()
+    #     )
 
-    except Exception as e:
-        print('Error: ' + str(e))
+    #     # for key, value in request.form.items():
+    #     #     form_data[key] = value
+    #     # name = form_data["name"]
+    #     # email = form_data["email"]
+    #     # phone = form_data["phone"]
+    #     name = request.name
+    #     email = request.email
+    #     phone = request.phone
+    #     link = f"https://drive.google.com/file/d/{uploaded_file['id']}"
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3001)
+    #     creds = service_account.Credentials.from_service_account_file(
+    #         FILE, scopes=SCOPES
+    #     )
+    #     client = gspread.authorize(creds)
+    #     spreadsheet = client.open_by_key(SPREADSHEET_ID)
+    #     worksheet = spreadsheet.worksheet(RANGE)
+    #     data = [name, email, phone, link]
+    #     return worksheet.append_row(data)
+
+    # except Exception as e:
+    #     print("Error: " + str(e))
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)

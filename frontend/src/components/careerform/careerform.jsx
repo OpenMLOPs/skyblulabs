@@ -35,7 +35,7 @@ const Careerform = () => {
         });
         try {
             setLoading(true);
-            await axios.post('http://localhost:3001/careers', formDataToSend, {
+            await axios.post('http://localhost:8000/careers', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
