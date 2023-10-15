@@ -10,6 +10,6 @@ gspread==5.10.0
 httplib2==0.22.0
 oauthlib==3.2.2
 python-dotenv==1.0.0
-Werkzeug==2.3.7
 fastapi==0.89.1
 uvicorn==0.20.0
+python-multipart==0.0.6
