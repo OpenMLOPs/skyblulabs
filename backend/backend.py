@@ -49,7 +49,7 @@ def verify_token(token):
             payload = jwt.decode(
                 token,
                 rsa_key,
-                algorithms=e.algorithm,
+                algorithms=[e.algorithm],
                 audience=e.api_identifier,
                 issuer=f"https://{e.auth0domain}/",
             )
