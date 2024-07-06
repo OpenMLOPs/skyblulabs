@@ -3,7 +3,9 @@ from pydantic import BaseModel, EmailStr
 import uvicorn
 from environment_variables import Env
 from pymongo import MongoClient
+from pymongo.errors import OperationFailure
 from jose import jwt
+from jose.exceptions import JWTError
 from urllib.request import urlopen
 import json
 
@@ -26,7 +28,7 @@ class UserCreate(BaseModel):
 
 
 def get_jwks():
-    jwks_url = f"https://{AUTH0_DOMAIN}/.well-known/jwks.json"
+    jwks_url = f"https://{e.auth0domain}/.well-known/jwks.json"
     response = urlopen(jwks_url)
     return json.loads(response.read())
 
@@ -63,24 +65,38 @@ def verify_token(token):
     return None
 
 
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to DB API"}
+
+
 @app.post("/submit")
 async def submit(user: UserCreate, request: Request):
-    token = request.headers.get("Authorization").split()[1]
-    payload = verify_token(token)
-    if payload:
-        data = {
-            "firstName": user.firstName,
-            "lastName": user.lastName,
-            "email": user.email,
-            "phone": user.phone,
-            "company": user.company,
-            "country": user.country,
-            "message": user.message,
-        }
-        collection.insert_one(data)
-        return {"message": "Form Submitted Successfully"}
-    else:
-        return {"message": "Token expired"}, 403
+    try:
+        token = request.headers.get("Authorization").split()[1]
+        payload = verify_token(token)
+        if payload:
+            data = {
+                "firstName": user.firstName,
+                "lastName": user.lastName,
+                "email": user.email,
+                "phone": user.phone,
+                "company": user.company,
+                "country": user.country,
+                "message": user.message,
+            }
+            collection.insert_one(data)
+            return {"message": "Form Submitted Successfully"}
+        else:
+            return {"message": "Token expired"}, 403
+    except AttributeError:
+        return {"message":"Token cannot be retrieved"}, 400
+    except OperationFailure:
+        return {"message":"Pymongo connection failed"}, 400
+    except JWTError as e:
+        return {"message": str(e)}, 400
+    except Exception as e:
+        return {"message": str(e)}, 500
 
 
 if __name__ == "__main__":
