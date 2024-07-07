@@ -22,6 +22,12 @@ class Env():
             os.environ.get("API_IDENTIFIER")
         self._algorithm = \
             os.environ.get("ALGORITHMS")
+        self._clientid = \
+            os.environ.get("CLIENT_ID")
+        self._clientsecret = \
+            os.environ.get("CLIENT_SECRET")
+        self._audience = \
+            os.environ.get("AUDIENCE")
     
     @property
     def mongo_uri(self):
@@ -46,6 +52,18 @@ class Env():
     @property
     def algorithm(self):
         return self._algorithm
+    
+    @property
+    def clientid(self):
+        return self._clientid
+    
+    @property
+    def clientsecret(self):
+        return self._clientsecret
+    
+    @property
+    def audience(self):
+        return self._audience
     
 
 if __name__ == '__main__':
